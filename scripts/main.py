@@ -17,7 +17,6 @@ from tqdm import tqdm
 import model.tree_module as M
 from data.data import getDataloader
 from myutils import *
-sys.path.append('/home/wind/Research/VQA/old/ACMN-Pytorch')
 
 ########################################################
 ## 					  Set Parameters			 	  ##

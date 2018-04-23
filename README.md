@@ -27,3 +27,12 @@ If you find this code useful in your research then please cite
   year={2018}
 }
 ```
+
+
+
+# TODO
+```
+1. data preprocess
+2. image feature extract
+3. train and evaluation
+```
