@@ -15,3 +15,15 @@ Qingxing Cao,
  <div align="center">
   <img src="https://github.com/bezorro/ACMN-Pytorch/blob/master/img/introduction.png" width="450px">
 </div>
+
+If you find this code useful in your research then please cite
+
+```
+@inproceedings{cao2018acmn,
+  title={Visual Question Reasoning on General Dependency Tree},
+  author={Qingxing Cao and Xiaodan Liang and Bailing Li and Guanbin Li
+          and Liang Lin},
+  booktitle={CVPR},
+  year={2018}
+}
+```
