@@ -48,12 +48,21 @@ You can follow the [instructions](https://github.com/jcjohnson/clevr-iep/blob/ma
 ## Step 2: Preprocess Questions
 Codes for preprocessing would be available soon. For now you can download our preprocessed data with the following commands:
 ```
-sh ./data/clevr/download_preprocessed_questions.sh
+$ sh ./data/clevr/download_preprocessed_questions.sh
 ```
 
 ## Step 3: Extract Image Features
 Codes for image feature extraction and our extracted image features would be available soon. For now you can follow the [instructions](https://github.com/jcjohnson/clevr-iep/blob/master/TRAINING.md) to extract image features.
 We assume the extracted features `features_train.h5`, `features_val.h5`, `features_test.h5` are placed in `./data/clevr/clevr_res101/`.
+
+# Training
+You can use the `main.py` script to train and validate the model.
+```
+$ python scripts/main.py \
+  --vocab_dir=data/clevr/clevr_qa_dir/ \
+  --qa_dir=data/clevr/clevr_qa_dir/parsed_tree/ \
+  --clevr_img_h5=data/clevr/clevr_res101/
+```
 
 # TODO
 ```
