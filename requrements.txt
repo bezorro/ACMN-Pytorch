@@ -3,7 +3,6 @@ tensorboardX
 skimage
 scipy
 numpy
-scipy
 torchvision
 h5py
 tqdm

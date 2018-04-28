@@ -1,6 +1,6 @@
 # Visual Question Reasoning on General Dependency Tree
 
-This is the code for the paper
+This is the code for the paper on CLEVR
 
  **<a href="https://arxiv.org/abs/1804.00105">Visual Question Reasoning on General Dependency Tree</a>**
  <br>
@@ -28,11 +28,36 @@ If you find this code useful in your research then please cite
 }
 ```
 
+# Requirement
+  * pytorch 0.3.0.post4
+  * python 3.5
+  * tensorboardX
+  * skimage
+  * scipy
+  * numpy
+  * torchvision
+  * h5py
+  * tqdm
 
+# Data Preprocessing
+Before you can train any models, you need to download the datasets; you also need to preprocess questions, and extract features for the images.
+
+## Step 1: Download the data
+You can follow the [instructions](https://github.com/jcjohnson/clevr-iep/blob/master/TRAINING.md) to download CLEVR dataset. Or you can skip this step by using our preprossed questions data(Step 2) and extracted image features(Step 3).
+
+## Step 2: Preprocess Questions
+Codes for preprocessing would be available soon. For now you can download our preprocessed data with the following commands:
+```
+sh ./data/download_preprocessed_questions.sh
+```
+
+## Step 3: Extract Image Features
+Codes for image feature extraction and our extracted image features would be available soon. For now you can follow the [instructions](https://github.com/jcjohnson/clevr-iep/blob/master/TRAINING.md) to extract image features.
+We assume the extracted features `features_train.h5`, `features_val.h5`, `features_test.h5` are placed in `./data/clevr/clevr_res101/`.
 
 # TODO
 ```
-1. data preprocess
-2. image feature extract
+1. data preprocess code
+2. upload image feature
 3. train and evaluation
 ```
