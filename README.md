@@ -48,7 +48,7 @@ You can follow the [instructions](https://github.com/jcjohnson/clevr-iep/blob/ma
 ## Step 2: Preprocess Questions
 Codes for preprocessing would be available soon. For now you can download our preprocessed data with the following commands:
 ```
-sh ./data/download_preprocessed_questions.sh
+sh ./data/clevr/download_preprocessed_questions.sh
 ```
 
 ## Step 3: Extract Image Features
