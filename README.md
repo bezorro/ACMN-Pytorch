@@ -99,13 +99,13 @@ Then use `test.py` to generate `CLEVR-test` results in `.json` format.
 ```
 $ python scripts/test.py \
   --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
-  --clevr_img_h5=data/clevr/clevr_res101/
+  --clevr_img_h5=data/clevr/clevr_res101/ \
+  --resume=data/clevr/clevr_pretrained_model.pth
 ```
 
 ## TODO
 ```
 1. data preprocess code
 2. upload pytorch image feature extract code
-3. train and evaluation
-4. visualize attention map
+3. visualize attention map
 ```

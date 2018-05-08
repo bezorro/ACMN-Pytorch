@@ -27,13 +27,13 @@ opt.__dict__ = { **opt.__dict__, **dataset_test.dataset.opt }
 #------ get mode_lrunner -----
 from vqa_lab.model.model_runner import getModelRunner
 print('==> Building Network :')
-model_runner   = getModelRunner(opt.run_model)(opt)
+model_runner = getModelRunner(opt.run_model)(opt)
 #----------- end -------------
 
 #----------- main ------------
+print('Generating test results...')
 answer_map = {}
 
-print('Generating test results...')
 for i_batch, input_batch in enumerate(tqdm(dataset_test)):
 
     output_batch = model_runner.test_step(input_batch)
@@ -44,6 +44,6 @@ for i_batch, input_batch in enumerate(tqdm(dataset_test)):
 
 with open(os.path.join(opt.logdir, 'CLEVR_TEST_results.txt' ), 'w') as f:
     for i in range(len(answer_map.keys())):
-    	print(answer_map[i], file = f)
+        print(answer_map[i], file = f)
     print(os.path.join(opt.logdir, 'CLEVR_TEST_results.txt' ) + ' saved.')
 #----------- end -------------
