@@ -76,8 +76,9 @@ class tree_attention_Residual(tree_attention_abstract_DP):
 
 	def root_to_att(self, que_enc, img, tree, node_values):
 		max_feat_len = self.attNum*self.num_node_feature
-		res = Variable(torch.FloatTensor(self.batch_size, max_feat_len).zero_()).cuda() # res = node_values[0].sum(1).squeeze()+ans_feat
-		for i in range(self.batch_size):
+		batch_size = img.size(0)
+		res = Variable(torch.FloatTensor(batch_size, max_feat_len).zero_()).cuda() # res = node_values[0].sum(1).squeeze()+ans_feat
+		for i in range(batch_size):
 			j = len(tree[i]) - 1
 			res[i] = node_values[0][i][j]
 

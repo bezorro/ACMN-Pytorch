@@ -75,7 +75,6 @@ class tree_attention_abstract_DP(nn.Module):
         super(tree_attention_abstract_DP, self).__init__()
         self.featMapH = 14
         self.featMapW = 14
-        self.batch_size = opt.batch_size
         self.num_proposal = self.featMapH * self.featMapW
         self.input_emb_size = opt.sentence_emb
         self.dropout = opt.dropout
@@ -87,14 +86,14 @@ class tree_attention_abstract_DP(nn.Module):
         # self.num_output = opt.num_output # mc number 
 
         if opt.load_lookup: self.lookup = torch.load(os.path.join(opt.vocab_dir,'lookup.pth')); self.lookup.weight.requires_grad = True
-        else: self.lookup = nn.Embedding(opt.vocab_size + 1, opt.word_emb_size, padding_idx = 0) #mask zero
+        else: self.lookup = nn.Embedding(opt.vocab_size + 1, opt.word_emb, padding_idx = 0) #mask zero
         self.q_LSTM = nn.LSTM(300,1024,1,bidirectional=True)#droput not exist for 1-layer RNN
         self.CNN = CNN()
 
     def forward(self, que, img, tree):
         # img(B, 3, self.featMapHW, self.featMapHW)
         que_enc, que_enc_sent = self._encoder(que) # (batch_size, emb)
-        self.batch_size = que_enc.size(0)
+        batch_size = que_enc.size(0)
         #-------img prepro------------------
         def l2normalizer(img):
             img = img.transpose(1, 2).transpose(2, 3).contiguous().view(-1, 1024)
@@ -112,7 +111,7 @@ class tree_attention_abstract_DP(nn.Module):
         def get_selected_map(tree, maxh):
             selected_map = []
             que_len = []
-            for i in range(self.batch_size):
+            for i in range(batch_size):
                 length = 0
                 tmap = [[] for _ in range(maxh)]
                 for j in range(len(tree[i])):
@@ -123,7 +122,7 @@ class tree_attention_abstract_DP(nn.Module):
                 que_len.append(length)
             return selected_map, que_len
         #--------------end----------------------
-        node_values = [[len(tree[i]) * [o] for i in range(self.batch_size)] for o in self.init_node_values()] # init node_values
+        node_values = [[len(tree[i]) * [o] for i in range(batch_size)] for o in self.init_node_values()] # init node_values
         # node_values = [K, B, tree_len(varlen)] , a init value in each grid
         selected_map, que_len = get_selected_map(tree, self.bmax_height)
         # selected_map = [B, H, hnodes_pos(varlen)]
@@ -133,7 +132,7 @@ class tree_attention_abstract_DP(nn.Module):
             tmp_q_inputs = Variable(torch.FloatTensor(bs_sum,self.input_emb_size).zero_()).cuda()
             tree_nodes = []
             cnt = 0
-            for i in range(self.batch_size):
+            for i in range(batch_size):
                 for j in range(len(selected_map[i][height])): 
                     t_node = tree[i][selected_map[i][height][j]]
                     # tmp_word_inputs[cnt][-len(t_node['word']):] = torch.LongTensor(t_node['word'])
@@ -155,9 +154,9 @@ class tree_attention_abstract_DP(nn.Module):
                         cnt += 1
 
         for height in range(self.bmax_height):
-            bs_sum = sum([len(selected_map[i][height]) for i in range(self.batch_size)])
+            bs_sum = sum([len(selected_map[i][height]) for i in range(batch_size)])
             ijlist = []
-            for i in range(self.batch_size): 
+            for i in range(batch_size): 
                 for j in selected_map[i][height]: ijlist.append((i, j))
             tmp_inputs, node_que_enc = self.load_tmp_values(img, que_enc, tree, ijlist, node_values, height) # [4, TS(batch_sum_mnum, maxson, f1, f2...) ]
             tmp_word_inputs, tree_nodes, ijlist, tmp_q_inputs = get_tw_tn(bs_sum, height)
@@ -198,19 +197,3 @@ class tree_attention_abstract_DP(nn.Module):
             qenc = F.normalize(qenc.view(-1,self.input_emb_size)).view(self.sent_len,-1,self.input_emb_size)
             enc = qenc[-1]
             return enc, qenc
-
-    # def biLSTM_encoder(self, sentence, enc_mode=None):
-    #   # sentence vocab begins from 1.And 0 means no word
-    #   # input size: -1 * sentence_length
-    #   # output size: -1 * embedding_size
-    #   if enc_mode is None: enc_mode = self.enc_mode
-    #   emb = self.lookup(sentence.view(-1, self.sent_len))
-    #   if enc_mode == 'bow':
-    #       enc = emb.sum(1).view(-1, self.input_emb_size) # (batch_size, emb)
-    #   elif enc_mode == 'LSTM':
-    #       # h0 = Variable(torch.FloatTensor(1, emb.size(0), self.input_emb_size).zero_()).cuda()
-    #       # c0 = Variable(torch.FloatTensor(1, emb.size(0), self.input_emb_size).zero_()).cuda()
-    #       qenc, _ = self.q_LSTM(emb.transpose(0,1))
-    #       enc = qenc[0]
-    #   enc = F.normalize(enc)
-    #   return enc

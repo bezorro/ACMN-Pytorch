@@ -47,7 +47,7 @@ You can follow the [instructions](https://github.com/jcjohnson/clevr-iep/blob/ma
 
 ## Step 2: Preprocess Questions
 Codes for preprocessing would be available soon. For now you can download our preprocessed data with the following commands:
-```
+```sh
 $ sh ./data/clevr/download_preprocessed_questions.sh
 ```
 
@@ -56,24 +56,28 @@ Codes for image feature extraction and our extracted image features would be ava
 We assume the extracted features `features_train.h5`, `features_val.h5`, `features_test.h5` are placed in `./data/clevr/clevr_res101/`.
 
 # Pretrained Models
-You can download the pretrained models with common below. The models will take about 2.6 GB on disk.
-```
+You can download the pretrained models with common below. The model will take about 2.6 GB on disk.
+```sh
 $ sh ./data/clevr/download_pretrained_model.sh
 ```
 
-# Training
-You can use the `main.py` script to train and validate the model.
-```
-$ python scripts/main.py \
-  --vocab_dir=data/clevr/clevr_qa_dir/ \
-  --qa_dir=data/clevr/clevr_qa_dir/parsed_tree/ \
+# Training on CLEVR
+You can use the `main.py` script to train on CLEVR-train set and validate the model on CLEVR-val set.
+```sh
+$ python scripts/train.py \
+  --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
   --clevr_img_h5=data/clevr/clevr_res101/ \
   --resume=data/clevr/clevr_pretrained_model.pth
+```
+The below script has the hyperparameters and settings to reproduce ACMN CLEVR results:
+```
+$ sh scripts/train_val.sh
 ```
 
 # TODO
 ```
 1. data preprocess code
-2. upload image feature
+2. upload pytorch image feature extract code
 3. train and evaluation
+4. visualize attention map
 ```
