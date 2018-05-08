@@ -72,8 +72,9 @@ class clevrDataset(Dataset):
             self.img_file = self.img_png
 
         # train_test json
-        vocab    = read_json(os.path.join(self.qa_dir, 'Vocab.json'))
-        ansVocab = read_json(os.path.join(self.qa_dir, 'AnsVocab.json'))
+        vocab            = read_json(os.path.join(self.qa_dir, 'Vocab.json'))
+        ansVocab         = read_json(os.path.join(self.qa_dir, 'AnsVocab.json'))
+        self.ansVocabRev = read_json(os.path.join(self.qa_dir, 'AnsVocabRev.json'))
 
         self.opt = {
                         'vocab_size'     : len(vocab)   , \
@@ -96,15 +97,6 @@ class clevrDataset(Dataset):
 
         img_id = self.qas['img_id'][idx]
 
-        if self.mode == 'test': 
-
-            answer = None
-
-        else:
-
-            answer = self.qas['answers'][idx][0] - 1
-            answer = answer.item()
-
         qid = self.qas['question_id'][idx]
         
         def id2imgName(img_id, qid):
@@ -122,10 +114,12 @@ class clevrDataset(Dataset):
         sample = { 
                     'question' : self.qas['question'][idx]                , \
                     'qid'      : qid                                      , \
-                    'answer'   : answer                                   , \
                     'image'    : get_image_feature(img_name)              , \
                     'img_name' : id2imgName(img_id, qid)                  , \
                }
+
+        if self.mode == 'train' or self.mode == 'val' : 
+            sample['answer'] = (self.qas['answers'][idx][0] - 1).item()
 
         if self.load_trees :
             sample['tree'] = self.trees[idx]

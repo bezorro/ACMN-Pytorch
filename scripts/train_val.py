@@ -14,12 +14,14 @@ parser = argparse.ArgumentParser(description='PyTorch CapsNet-Finetune(Openended
 # training settings
 parser.add_argument('--batch_size', type=int, default=32, help="training batch size")
 parser.add_argument('--run_dataset', type=str, default='clevr', choices=['clevr'], help='training datatset')
+parser.add_argument('--train_dataset', type=str, default='train', choices=['train', 'train+val'], help='training datatset')
 parser.add_argument('--run_model', type=str, default='restree', choices=['restree', 'rbn'], help='training model')
 parser.add_argument('--threads', type=int, default=0, help='number of threads for data loader to use')
 parser.add_argument('--max_epoch', type=int, default=1000, help='max epoches')
 parser.add_argument('--seed', type=int, default=99, help='random seed to use. Default=99')
 parser.add_argument('--display_interval', type=int, default=100)
 parser.add_argument('--no_val', type=bool, default=False)
+parser.add_argument('--no_train', type=bool, default=False)
 parser.add_argument('--resume', type=str, default=None, help='resume file name')
 parser.add_argument('--gpu', type=bool, default=True, help='use gpu or not')
 # log settings
@@ -40,12 +42,13 @@ writer = SummaryWriter(opt.logdir)
 #------ get dataloaders ------
 from vqa_lab.data.data_loader import getDateLoader
 print('==> Loading datasets :')
-
-Dataloader                  = getDateLoader(opt.run_dataset)
-dataset_train, dataset_val  = Dataloader('train', opt), Dataloader('val'  , opt)
-opt.__dict__                = { **opt.__dict__, **dataset_train.dataset.opt }
-#dataset_train = Dataloader('train+val', opt)
-#opt.__dict__                = { **opt.__dict__, **dataset_train.dataset.datasets[0].opt }
+Dataloader = getDateLoader(opt.run_dataset)
+if opt.train_dataset == 'train' :
+	dataset_train, dataset_val  = Dataloader('train', opt), Dataloader('val'  , opt)
+	opt.__dict__                = { **opt.__dict__, **dataset_train.dataset.opt }
+elif opt.train_dataset == 'train+val' :
+	dataset_train = Dataloader('train+val', opt)
+	opt.__dict__                = { **opt.__dict__, **dataset_train.dataset.datasets[0].opt }
 #----------- end -------------
 
 #------ get mode_lrunner -----
@@ -57,6 +60,8 @@ finished_epoch = model_runner.finished_epoch
 
 #---------- train ------------
 def train(epoch):
+	if opt.no_train==True: return
+
 	print('==> Train-Epoch {:d} :'.format(epoch))
 
 	LE = LossEvaluator()
@@ -73,7 +78,7 @@ def train(epoch):
 
 #----------- val -------------
 def val(epoch):
-	if opt.no_val: return
+	if opt.no_val==True: return
 
 	print('==> Evaluate-Epoch {:d} :'.format(epoch))
 

@@ -3,7 +3,7 @@
 basepath=$(cd `dirname $0`; pwd)
 cd $basepath
 
-python train.py \
+python train_val.py \
 	--tree_lr=9e-5 \
 	--tree_beta1=0.9 \
 	--tree_beta2=0.999 \
@@ -24,12 +24,13 @@ python train.py \
 	--seed=99 \
 	--run_model=restree \
 	--run_dataset=clevr \
+	--train_dataset=train \
 	--clevr_image_source=h5 \
 	--clevr_load_trees=True \
 	--clevr_qa_dir=../data/clevr/clevr_qa_dir/ \
 	--clevr_img_h5=../data/clevr/clevr_res101/
 
-python train.py \
+python train_val.py \
 	--tree_lr=5e-6 \
 	--tree_beta1=0.9 \
 	--tree_beta2=0.999 \
@@ -50,6 +51,7 @@ python train.py \
 	--seed=99 \
 	--run_model=restree \
 	--run_dataset=clevr \
+	--train_dataset=train \
 	--clevr_image_source=h5 \
 	--clevr_load_trees=True \
 	--logdir=logs/train_val \

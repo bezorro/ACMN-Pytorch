@@ -32,19 +32,20 @@ def DataloaderClevr(mode, opt = {}, dl = False, opt_prefix = 'clevr_'):
                     'question': torch.stack(raw_samples['question'])   ,
                     'image'   : torch.stack(raw_samples['image'])      ,
                     'qid'     : torch.LongTensor(raw_samples['qid'])   ,
-                    'answer'  : torch.LongTensor(raw_samples['answer']),
                 }
 
+		if 'answer'     in raw_samples : 
+			samples['answer']  = torch.LongTensor(raw_samples['answer'])
 		if 'tree'       in raw_samples : 
-			samples['tree'] = raw_samples['tree']
+			samples['tree']    = raw_samples['tree']
 		if 'img_png'    in raw_samples :
-			samples['img_png']    = torch.stack(raw_samples['img_png'])
+			samples['img_png'] = torch.stack(raw_samples['img_png'])
 
 		return samples
 
 	dataset_opt = argparse.Namespace(**{ k[prefix_len:] : v for k, v in my_opt.__dict__.items() }) # remove opt prefix
-
-	dataset = clevrDataset(dataset_opt, mode)
+	from functools import reduce
+	dataset = reduce(lambda x, y : x + y, [clevrDataset(dataset_opt, m) for m in mode.split('+')])
 
 	return DataLoader(dataset                      ,
                     batch_size  = opt.batch_size   ,
