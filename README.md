@@ -114,7 +114,7 @@ $ python scripts/vis.py \
   --resume=data/clevr/clevr_pretrained_model.pth
 ```
 <div align="center">
-  <img src="https://github.com/bezorro/ACMN-Pytorch/blob/master/img/demo.png" width="450px">
+  <img src="https://github.com/bezorro/ACMN-Pytorch/blob/master/img/demo.png" width="900px">
 </div>
 
 ## TODO
