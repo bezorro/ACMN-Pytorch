@@ -19,31 +19,39 @@ class SingleNumberVizer(object):
 import matplotlib.cm
 from skimage import io, img_as_float
 from skimage.transform import resize, rescale
-import os
+import os, textwrap
+from PIL import ImageDraw, Image
 import scipy.misc
 
-def get_attimg(img, attmap, cm = matplotlib.cm.ScalarMappable(cmap="jet")):
+def get_attimg(image, attmap, cm = matplotlib.cm.ScalarMappable(cmap="jet")):
 
-	h = img.shape[1]
-	w = img.shape[2]
+	h, w = image.size(1), image.size(2)
 	s = attmap.size(-1)
-	attmap = attmap.squeeze().view(s, s).numpy()
-	# attmap = cm.to_rgba(attmap)[:, :, 0:3]
+	attmap = attmap.squeeze().view(s, s).data.cpu().numpy()
 	attmap = resize(attmap, (h, w), mode='reflect')
 	attmap = cm.to_rgba(attmap)[:, :, 0:3]
+	attmap = torch.from_numpy(attmap).float().permute(2, 0, 1)
 
-	img = img.permute(1, 2, 0).numpy()
+	return image + attmap
 
-	return img + attmap
+def get_textimg(image, text):
+
+	h, w = image.size(1), image.size(2)
+	txt = Image.new('RGB', (w,h), (0,0,0))
+	d = ImageDraw.Draw(txt)
+	draw_text = d.text((0,0), '\n'.join([line for line in textwrap.wrap(text, width=80)]), fill=(1,1,1))
+	text = torch.from_numpy(np.array(list(txt.getdata()), dtype=np.float32).reshape(h, w, 3)).permute(2, 0, 1)
+
+	return (image + text)
 
 class AttImgVizer(object):
 	
 	def __init__(self, output_dir, sample_num):
 		super(AttImgVizer, self).__init__()
 
-		self.output_dir   = output_dir
-		self.sample_num   = sample_num
-		self.colormap     = matplotlib.cm.ScalarMappable(cmap="jet")
+		self.output_dir = output_dir
+		self.sample_num = sample_num
+		self.colormap   = matplotlib.cm.ScalarMappable(cmap="jet")
 
 		if not os.path.isdir(self.output_dir): os.mkdir(self.output_dir)
 
@@ -67,6 +75,55 @@ class AttImgVizer(object):
 					 + str(i_attlist) + '_N' + str(i_attmap) + '.jpg'), attimg)
 
 			print(msgs[i_batch] + '?')
+
+class AttTreeImgVizer(object):
+	
+	def __init__(self, output_dir, sample_num, vocab_rev, ansvocab_rev):
+		super(AttTreeImgVizer, self).__init__()
+
+		self.vdict_rev  = vocab_rev
+		self.adict_rev  = ansvocab_rev
+		self.output_dir = output_dir
+		self.sample_num = sample_num
+		self.colormap   = matplotlib.cm.ScalarMappable(cmap="jet")
+
+		if not os.path.isdir(self.output_dir): os.mkdir(self.output_dir)
+
+	def _get_qstr(self, q) :
+		return ' '.join([self.vdict_rev[i - 1] for i in q if i > 0]) + '?'
+
+	def _get_qimage(self, image, question, predict, answer = None) :
+		# if im.ndim == 2: im = im[:, :, np.newaxis].repeat(3, axis=2)
+		qap = 'Q: '+ self._get_qstr(question) + ' Pred: ' + self.adict_rev[predict.max(0)[1][0]] + ' GT: ' + self.adict_rev[answer]
+		return get_textimg(image, qap)
+
+	def _get_single_node(self, image, att_map, node):
+		node_text  = ' '.join(map(lambda x : self.vdict_rev[x - 1], node['word']))
+		text_image = get_textimg(image, node_text)
+		att_image  = get_attimg(text_image, att_map)
+
+		return att_image
+        
+
+	def _show_single_tree(self, image, node_value, tree, question, predict, answer = None) :
+		q_image = self._get_qimage(image, question, predict, answer)
+		scipy.misc.imsave(os.path.join(self.sample_dir, 'raw_image.jpg'), q_image.permute(1, 2, 0).numpy())
+
+		step = 0
+		for i in range(len(tree)):
+			if tree[i]['remain'] == 0: continue
+
+			n_image = self._get_single_node(image, node_value[i], tree[i])
+			scipy.misc.imsave(os.path.join(self.sample_dir, str(step) + '.jpg'), n_image.permute(1, 2, 0).numpy())
+			step += 1
+
+	def print_result(self, images, node_values, questions, trees, predicts, answers = None):
+		batch_size = images.size(0)
+		for i_batch in range(min(self.sample_num, batch_size)):
+	
+			self.sample_dir = os.path.join(self.output_dir, 'Sample_' + str(i_batch))
+			if not os.path.isdir(self.sample_dir): os.mkdir(self.sample_dir)
+			self._show_single_tree(images[i_batch], node_values[i_batch], trees[i_batch], questions[i_batch], predicts[i_batch], answers[i_batch] if answers is not None else None)
 
 #---------------------------------------------- display tree ------------------------------------------
 import torch

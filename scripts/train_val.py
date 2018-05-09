@@ -1,5 +1,4 @@
 from __future__ import print_function, division
-from tensorboardX import SummaryWriter
 from tqdm import tqdm
 import torch
 import os, sys

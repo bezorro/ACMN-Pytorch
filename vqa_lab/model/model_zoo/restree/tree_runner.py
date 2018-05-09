@@ -13,7 +13,7 @@ def ModelRunner_Tree(opt):
 	parser.add_argument('--tree_lr', type=float, default=9e-5)
 	parser.add_argument('--tree_beta1', type=float, default=0.9)
 	parser.add_argument('--tree_beta2', type=float, default=0.999)
-	parser.add_argument('--tree_weight_decay', type=float, default=1e-5)
+	parser.add_argument('--tree_weight_decay', type=float, default=0)
 	parser.add_argument('--tree_gpu', type=bool, default=True)
 	parser.add_argument('--tree_load_lookup', type=bool, default=False)
 	parser.add_argument('--tree_resume', type=str, default=None)

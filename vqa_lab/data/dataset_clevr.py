@@ -75,6 +75,7 @@ class clevrDataset(Dataset):
         vocab            = read_json(os.path.join(self.qa_dir, 'Vocab.json'))
         ansVocab         = read_json(os.path.join(self.qa_dir, 'AnsVocab.json'))
         self.ansVocabRev = read_json(os.path.join(self.qa_dir, 'AnsVocabRev.json'))
+        self.VocabRev    = read_json(os.path.join(self.qa_dir, 'VocabRev.json'))
 
         self.opt = {
                         'vocab_size'     : len(vocab)   , \
@@ -125,7 +126,7 @@ class clevrDataset(Dataset):
             sample['tree'] = self.trees[idx]
 
         if self.load_png :
-            sample['img_png'] = self.preprocess(Image.open(os.path.join(self.img_png, id2imgName(img_id, qid))).convert('RGB'))
+            sample['img_png'] = transforms.ToTensor()(Image.open(os.path.join(self.img_png, id2imgName(img_id, qid))).convert('RGB'))
 
         return sample
 

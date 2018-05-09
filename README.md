@@ -56,7 +56,7 @@ Codes for image feature extraction and our extracted image features would be ava
 We assume the extracted features `features_train.h5`, `features_val.h5`, `features_test.h5` are placed in `./data/clevr/clevr_res101/`.
 
 ## Pretrained Models
-You can download the pretrained models with common below. The model will take about 2.6 GB on disk.
+You can download the pretrained models with the common below. The model will take about 2.6 GB on disk.
 ```sh
 $ sh ./data/clevr/download_pretrained_model.sh
 ```
@@ -69,16 +69,24 @@ You can use the `train_val.py` script to train on `CLEVR-train` and validate the
 $ python scripts/train_val.py \
   --train_dataset=train \
   --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
-  --clevr_img_h5=data/clevr/clevr_res101/ \
-  --resume=data/clevr/clevr_pretrained_model.pth
+  --clevr_img_h5=data/clevr/clevr_res101/
 ```
 The below script has the hyperparameters and settings to reproduce ACMN CLEVR results.
 ```
 $ sh scripts/train_val.sh
 ```
+If you simply want to train on `CLEVR-train+val`.
+Use `train_val.py` with `--train_dataset=train+val` to train and activate `--no_val` option to skip the validation process.
+```
+$ python scripts/train_val.py \
+  --no_val=True \
+  --train_dataset=train+val \
+  --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
+  --clevr_img_h5=data/clevr/clevr_res101/
+```
 
 ## Evaluation
-You can use `train_val.py` to simply evaluate the model on `CLEVR-val`.
+You can use `train_val.py` to simply evaluate the model on `CLEVR-val` with `--no_train` option to skip the training process.
 ```sh
 $ python scripts/train_val.py \
   --no_train=True \
@@ -86,16 +94,7 @@ $ python scripts/train_val.py \
   --clevr_img_h5=data/clevr/clevr_res101/ \
   --resume=data/clevr/clevr_pretrained_model.pth
 ```
-If you want to train on `CLEVR-train+val` and evaluate on `CLEVR-test`.
-Firstly, use `train_val.py` with `--no_val` option to train.
-```
-$ python scripts/train_val.py \
-  --no_val=True \
-  --train_dataset=train+val \
-  --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
-  --clevr_img_h5=data/clevr/clevr_res101/ \
-```
-Then use `test.py` to generate `CLEVR-test` results in `.json` format.
+You can use `test.py` to generate `CLEVR-test` results in `.json` format so that you can upload to CLEVR official.
 ```
 $ python scripts/test.py \
   --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
@@ -103,9 +102,22 @@ $ python scripts/test.py \
   --resume=data/clevr/clevr_pretrained_model.pth
 ```
 
+## Visualizing attention maps
+You can use `vis.py` to visualize the attention maps discribed in `Figure 4` of our paper.
+```
+$ python scripts/vis.py \
+  --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
+  --clevr_img_h5=data/clevr/clevr_res101/ \
+  --clevr_img_png=data/clevr/ \
+  --clevr_load_png=True \
+  --logdir=logs/attmaps \
+  --resume=data/clevr/clevr_pretrained_model.pth
+```
+<div align="center">
+  <img src="https://github.com/bezorro/ACMN-Pytorch/blob/master/img/demo.png" width="450px">
+</div>
+
 ## TODO
 ```
-1. data preprocess code
-2. upload pytorch image feature extract code
-3. visualize attention map
+1. upload pytorch image feature extract code.
 ```
