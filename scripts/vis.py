@@ -29,7 +29,7 @@ if opt.gpu: torch.cuda.manual_seed(opt.seed)
 from vqa_lab.data.data_loader import getDateLoader
 print('==> Loading datasets :')
 Dataloader   = getDateLoader(opt.run_dataset)
-dataset_run  = Dataloader('val', opt)
+dataset_run  = Dataloader('train', opt)
 opt.__dict__ = { **opt.__dict__, **dataset_run.dataset.opt }
 #----------- end -------------
 

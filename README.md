@@ -43,12 +43,14 @@ If you find this code useful in your research then please cite
 Before you can train any models, you need to download the datasets; you also need to preprocess questions, and extract features for the images.
 
 ### Step 1: Download the data
-You can follow the [instructions](https://github.com/jcjohnson/clevr-iep/blob/master/TRAINING.md) to download CLEVR dataset. Or you can skip this step by using our preprossed questions data(Step 2) and extracted image features(Step 3).
+You can download `CLEVR v1.0 (18 GB)` with the common below.
+$ sh data/clevr/download_dataset.sh
+```
 
 ### Step 2: Preprocess Questions
-Codes for preprocessing would be available soon. For now you can download our preprocessed data with the following commands:
+Codes for preprocessing would be available soon. For now you can download our preprocessed data with the following command:
 ```sh
-$ sh ./data/clevr/download_preprocessed_questions.sh
+$ sh data/clevr/download_preprocessed_questions.sh
 ```
 
 ### Step 3: Extract Image Features
@@ -58,7 +60,7 @@ We assume the extracted features `features_train.h5`, `features_val.h5`, `featur
 ## Pretrained Models
 You can download the pretrained models with the common below. The model will take about 2.6 GB on disk.
 ```sh
-$ sh ./data/clevr/download_pretrained_model.sh
+$ sh data/clevr/download_pretrained_model.sh
 ```
 It is trained on `CLEVR-train` and can be validate on `CLEVR-val`.
 
@@ -66,23 +68,11 @@ It is trained on `CLEVR-train` and can be validate on `CLEVR-val`.
 ## Training on CLEVR
 You can use the `train_val.py` script to train on `CLEVR-train` and validate the model on `CLEVR-val`.
 ```sh
-$ python scripts/train_val.py \
-  --train_dataset=train \
-  --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
-  --clevr_img_h5=data/clevr/clevr_res101/
+$ python scripts/train_val.py --clevr_qa_dir=data/clevr/clevr_qa_dir/ --clevr_img_h5=data/clevr/clevr_res101/
 ```
 The below script has the hyperparameters and settings to reproduce ACMN CLEVR results.
 ```
 $ sh scripts/train_val.sh
-```
-If you simply want to train on `CLEVR-train+val`.
-Use `train_val.py` with `--train_dataset=train+val` to train and activate `--no_val` option to skip the validation process.
-```
-$ python scripts/train_val.py \
-  --no_val=True \
-  --train_dataset=train+val \
-  --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
-  --clevr_img_h5=data/clevr/clevr_res101/
 ```
 
 ## Evaluation
@@ -102,13 +92,13 @@ $ python scripts/test.py \
   --resume=data/clevr/clevr_pretrained_model.pth
 ```
 
-## Visualizing attention maps
+## Visualizing Attention Maps
 You can use `vis.py` to visualize the attention maps discribed in `Figure 4` of our paper.
 ```
 $ python scripts/vis.py \
   --clevr_qa_dir=data/clevr/clevr_qa_dir/ \
   --clevr_img_h5=data/clevr/clevr_res101/ \
-  --clevr_img_png=data/clevr/ \
+  --clevr_img_png=data/clevr/CLEVR_v1.0/ \
   --clevr_load_png=True \
   --logdir=logs/attmaps \
   --resume=data/clevr/clevr_pretrained_model.pth

@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(description='PyTorch CapsNet-Finetune(Openended
 # training settings
 parser.add_argument('--batch_size', type=int, default=32, help="training batch size")
 parser.add_argument('--run_dataset', type=str, default='clevr', choices=['clevr'], help='training datatset')
-parser.add_argument('--train_dataset', type=str, default='train', choices=['train', 'train+val'], help='training datatset')
+parser.add_argument('--train_dataset', type=str, default='train', choices=['train', 'train+val', 'val'], help='training datatset')
 parser.add_argument('--run_model', type=str, default='restree', choices=['restree', 'rbn'], help='training model')
 parser.add_argument('--threads', type=int, default=0, help='number of threads for data loader to use')
 parser.add_argument('--max_epoch', type=int, default=1000, help='max epoches')
