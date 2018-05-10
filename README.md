@@ -44,6 +44,7 @@ Before you can train any models, you need to download the datasets; you also nee
 
 ### Step 1: Download the data
 You can download `CLEVR v1.0 (18 GB)` with the common below.
+```sh
 $ sh data/clevr/download_dataset.sh
 ```
 
