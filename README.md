@@ -1,4 +1,6 @@
 # Visual Question Reasoning on General Dependency Tree
+![Python version support](https://img.shields.io/badge/python-3.5%20%203.6-blue.svg)
+![PyTorch version support](https://img.shields.io/badge/pytorch-0.3%200.3.1-red.svg)
 
 This is the code for the paper on CLEVR
 
@@ -29,8 +31,6 @@ If you find this code useful in your research then please cite
 ```
 
 ## Requirement
-  * pytorch 0.3.0.post4
-  * python 3.5
   * tensorboardX
   * skimage
   * scipy
@@ -55,11 +55,14 @@ $ sh data/clevr/download_preprocessed_questions.sh
 ```
 
 ### Step 3: Extract Image Features
-Codes for image feature extraction and our extracted image features would be available soon. For now you can follow the [instructions](https://github.com/jcjohnson/clevr-iep/blob/master/TRAINING.md) to extract image features.
-We assume the extracted features `features_train.h5`, `features_val.h5`, `features_test.h5` are placed in `./data/clevr/clevr_res101/`.
+You can extract image features with the command below.
+```sh
+$ sh scripts/extract_image_feature.sh
+```
+The extracted features `features_train.h5`, `features_val.h5`, `features_test.h5` woulde be placed in `./data/clevr/clevr_res101/`.
 
 ## Pretrained Models
-You can download the pretrained models with the common below. The model will take about 2.6 GB on disk.
+You can download the pretrained models with the command below. The model will take about 2.6 GB on disk.
 ```sh
 $ sh data/clevr/download_pretrained_model.sh
 ```
@@ -107,8 +110,3 @@ $ python scripts/vis.py \
 <div align="center">
   <img src="https://github.com/bezorro/ACMN-Pytorch/blob/master/img/demo.png" width="900px">
 </div>
-
-## TODO
-```
-1. upload pytorch image feature extract code.
-```
