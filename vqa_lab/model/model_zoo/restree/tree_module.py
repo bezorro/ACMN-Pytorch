@@ -14,27 +14,25 @@ class tree_attention_Residual(tree_attention_abstract_DP):
 		self.max_height = 12
 		self.dropout=opt.dropout
 		self.attNum = 1
-		##########################################################
-		# self.node=ResAttUnit.NodeBlockShareW(self.max_height, self.img_emb_size, self.num_node_feature, self.input_emb_size, self.attNum, self.dropout)
-		##########################################################
+
 		self.node = []
-		self.nodeAtt = None#ResAttUnit.AttImgSonModule(self.img_emb_size,self.attNum,self.input_emb_size,self.dropout)
+		self.nodeAtt = None
 		for i in range(self.max_height):
-			self.node.append(ResAttUnit.NodeBlockResidual(i, self.img_emb_size, self.num_node_feature, self.input_emb_size, self.attNum, False, self.dropout))
+			self.node.append(ResAttUnit.NodeBlockResidual(i, self.img_emb_size, self.num_node_feature, self.input_emb_size, self.attNum, self.dropout))
 			self.add_module('node_'+str(i), self.node[i])
-		##########################################################
+
 		## AnsModule
-		self.fc0 = nn.Linear(self.attNum*self.num_node_feature, 512)
+		self.fc0 = nn.Linear(self.attNum * self.num_node_feature, 512)
 		self.bn0 = nn.BatchNorm1d(512)
 		self.fc1 = nn.Linear(512, 1024)
 		self.bn1 = nn.BatchNorm1d(1024)
 		self.fc2 = nn.Linear(1024, opt.out_vocab_size)
-		# self.fc3 = nn.Linear(256, opt.out_vocab_size)
 
 	def init_node_values(self):
 		return (None, None)
 
 	def load_tmp_values(self, img, que_enc, tree, tree_list, node_values, height):
+
 		node_que_enc = Variable(torch.FloatTensor(len(tree_list), self.input_emb_size).zero_()).cuda()
 		if height == 0:
 			input2 = Variable(torch.FloatTensor(len(tree_list), self.img_emb_size, self.featMapH, self.featMapW).zero_()).cuda()
@@ -60,9 +58,11 @@ class tree_attention_Residual(tree_attention_abstract_DP):
 					if tree[ibatch][son_pos]['dep'] > 10: input1[i, son_cnt] = node_values[1][ibatch][son_pos] #modifier: trans attMap
 				input2[i] = img[ibatch]
 				node_que_enc[i] = que_enc[ibatch]
+
 		return (input0,input1,input2,input3), node_que_enc
 
 	def answer(self, feat):
+
 		x_ = self.fc0(feat)
 		x_ = self.bn0(x_)
 		x_ = F.relu(x_)
@@ -70,18 +70,17 @@ class tree_attention_Residual(tree_attention_abstract_DP):
 		x_ = self.bn1(x_)
 		x_ = F.relu(x_)
 		x_ = self.fc2(F.dropout(x_, self.dropout, training = self.training))
-		# x_ = F.relu(x_)
-		# x_ = self.fc3(F.dropout(x_, self.dropout, training = self.training))
+
 		return x_
 
 	def root_to_att(self, que_enc, img, tree, node_values):
-		max_feat_len = self.attNum*self.num_node_feature
+
+		max_feat_len = self.attNum * self.num_node_feature
 		batch_size = img.size(0)
-		res = Variable(torch.FloatTensor(batch_size, max_feat_len).zero_()).cuda() # res = node_values[0].sum(1).squeeze()+ans_feat
+		res = Variable(torch.FloatTensor(batch_size, max_feat_len).zero_()).cuda()
 		for i in range(batch_size):
 			j = len(tree[i]) - 1
 			res[i] = node_values[0][i][j]
 
-		# res = F.relu(self.fc0(res))
 		predict = self.answer(res)
 		return predict

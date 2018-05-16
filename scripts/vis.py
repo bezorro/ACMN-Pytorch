@@ -47,7 +47,7 @@ for i_batch, input_batch in enumerate(tqdm(dataset_run)):
 
 	AV.print_result(images=input_batch['img_png'],
 					node_values=output_batch['node_values'][1],
-		            questions=input_batch['question'],
+					questions=input_batch['question'],
 					trees=input_batch['tree'],
 					predicts=output_batch['predicts'],
 					answers=input_batch['answer']) 
