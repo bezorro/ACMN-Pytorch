@@ -15,7 +15,7 @@ parser.add_argument('--run_dataset', type=str, default='clevr', choices=['clevr'
 parser.add_argument('--run_model', type=str, default='restree', choices=['restree'], help='training model')
 parser.add_argument('--threads', type=int, default=0, help='number of threads for data loader to use')
 parser.add_argument('--seed', type=int, default=66, help='random seed to use. Default=123')
-parser.add_argument('--resume', type=str, default='/home/wind/Research/VQA/old/ACMN-Pytorch/data/clevr/clevr_pretrained_model.pth', help='resume file name')
+parser.add_argument('--resume', type=str, default='../data/clevr/clevr_pretrained_model.pth', help='resume file name')
 parser.add_argument('--gpu', type=bool, default=True, help='use gpu or not')
 # log settings
 parser.add_argument('--logdir', type=str, default='logs/test', help='dir to tensorboard logs')

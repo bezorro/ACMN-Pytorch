@@ -12,7 +12,7 @@ Qingxing Cao,
  <a href='https://sites.google.com/site/ligb86/home/'>Guanbin Li</a>,
  <a href='http://www.linliang.net/'>Liang Lin</a>
  <br>
- Presented at [CVPR 2018](http://cvpr2018.thecvf.com/) (Spotlight Presentation)
+ Presented at [CVPR 2018](http://cvpr2018.thecvf.com/) ([Spotlight Presentation](https://www.youtube.com/watch?v=bWygTt1Na50&t=5132s))
 
  <div align="center">
   <img src="https://github.com/bezorro/ACMN-Pytorch/blob/master/img/introduction.png" width="450px">
@@ -21,12 +21,12 @@ Qingxing Cao,
 If you find this code useful in your research then please cite
 
 ```
-@inproceedings{cao2018acmn,
-  title={Visual Question Reasoning on General Dependency Tree},
-  author={Qingxing Cao and Xiaodan Liang and Bailing Li and Guanbin Li
-          and Liang Lin},
-  booktitle={CVPR},
-  year={2018}
+@InProceedings{Cao_2018_CVPR,
+author = {Cao, Qingxing and Liang, Xiaodan and Li, Bailing and Li, Guanbin and Lin, Liang},
+title = {Visual Question Reasoning on General Dependency Tree},
+booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+month = {June},
+year = {2018}
 }
 ```
 
