@@ -1,6 +1,6 @@
 # Visual Question Reasoning on General Dependency Tree
 ![Python version support](https://img.shields.io/badge/python-3.5%20%203.6-blue.svg)
-![PyTorch version support](https://img.shields.io/badge/pytorch-0.3%200.3.1-red.svg)
+![PyTorch version support](https://img.shields.io/badge/pytorch-0.4-red.svg)
 
 This is the code for the paper on CLEVR
 
