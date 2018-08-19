@@ -1,8 +1,8 @@
-import argparse
-import torch.optim as optim
-import torch.nn.functional as F
 import os
-from torch.autograd import Variable
+import torch
+import argparse
+import torch.nn.functional as F
+
 
 from vqa_lab.model.model_runner import ModelRunner
 from vqa_lab.utils import print_save, forced_copydir
@@ -48,23 +48,18 @@ def ModelRunner_Tree(opt):
 
 	def forward(model, input, volatile = False, only_forward = False):
 
-		questions, images, trees = Variable(input['question'], volatile=volatile), Variable(input['image'], volatile=volatile), input['tree']
-		
-		if my_opt.tree_gpu :
-			
-			questions, images = questions.cuda(), images.cuda()
+		device = torch.device('cuda' if my_opt.tree_gpu else "cpu")
+		questions, images, trees = input['question'].to(device), input['image'].to(device), input['tree']
 
-		predicts, node_values = model(questions, images, trees)
+		with torch.set_grad_enabled(not volatile): predicts, node_values = model(questions, images, trees)
 
-		output = { 'predicts': predicts.data.cpu(), 'node_values': node_values }
+		output = { 'predicts': predicts.cpu(), 'node_values': node_values }
 
 		if only_forward == False : 
 			
-			answers = Variable(input['answer'], volatile=volatile)
+			answers = input['answer'].to(device)
 
-			if my_opt.tree_gpu : answers = answers.cuda()
-
-			output['loss'] = F.cross_entropy(predicts, answers)
+			with torch.set_grad_enabled(not volatile): output['loss'] = F.cross_entropy(predicts, answers)
 
 		return output
 	

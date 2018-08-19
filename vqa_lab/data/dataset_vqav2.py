@@ -79,7 +79,7 @@ class vqa2Dataset(Dataset):
         print('    * vqa2-%s loaded' % mode)
 
         self.preprocess = transforms.Compose([
-           transforms.Scale((256,256)),
+           transforms.Resize((256,256)),
            transforms.ToTensor()
         ])
 

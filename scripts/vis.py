@@ -22,6 +22,7 @@ parser.add_argument('--logdir', type=str, default='logs/test', help='dir to tens
 opt, _ = parser.parse_known_args()
 print_save(opt.logdir, opt)
 
+torch.backends.cudnn.benchmark = True
 torch.manual_seed(opt.seed)
 if opt.gpu: torch.cuda.manual_seed(opt.seed)
 

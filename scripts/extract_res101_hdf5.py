@@ -1,5 +1,4 @@
 import torch
-from torch.autograd import Variable
 from torch.utils.data import Dataset
 from torchvision import datasets, models, transforms
 
@@ -20,17 +19,17 @@ opt = parser.parse_args()
 print(opt)
 
 def is_image_file(filename):
-    return any(filename.endswith(extension) for extension in [".png", ".jpg", ".jpeg"])
+    return any(filename.endswith(extension) for extension in [".png", ".jpg", ".jpeg"]) and os.path.getsize(filename)
 
 class DatasetFromFolder(Dataset):
 
     def __init__(self, image_dir):
         super(DatasetFromFolder, self).__init__()
 
-        self.image_filenames = [os.path.join(image_dir, x) for x in os.listdir(image_dir) if is_image_file(x)]
+        self.image_filenames = [os.path.join(image_dir, x) for x in os.listdir(image_dir) if is_image_file(os.path.join(image_dir, x))]
 
         self.transform = transforms.Compose([
-            transforms.Scale((224,224)),
+            transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize(mean = [ 0.485, 0.456, 0.406 ],
                                   std = [ 0.229, 0.224, 0.225 ]),
@@ -54,19 +53,22 @@ def printnormpre(self, input):
     features = input[0].data.cpu().numpy()
 net.layer3[-1].relu.register_forward_pre_hook(printnormpre)
 net = torch.nn.Sequential(*list(net.children())[:-3])
-if opt.gpu : net = net.cuda()
+device = torch.device('cuda' if opt.gpu else "cpu")
+net = net.to(device)
 
-# ------------- main ----------------------
-if not os.path.isdir(os.path.dirname(opt.out_path)) : os.mkdir(os.path.dirname(opt.out_path))
-file = h5py.File(opt.out_path,'w')
+if __name__ == '__main__':
+    if not os.path.isdir(os.path.dirname(opt.out_path)) : os.mkdir(os.path.dirname(opt.out_path))
+    file = h5py.File(opt.out_path,'w')
 
-for input_batch in tqdm(dataloader):
+    print('Extracting features...')
+    for input_batch in tqdm(dataloader):
 
-    imgs, names = input_batch
-    if opt.gpu : imgs = imgs.cuda()
-    net(Variable(imgs, volatile=True))
+        imgs, names = input_batch
+        imgs = imgs.to(device)
+        with torch.no_grad() : net(imgs)
 
-    for idx, name in enumerate(names) :
-        file.create_dataset(name, data = features[idx])
+        for idx, name in enumerate(names) :
+            file.create_dataset(name, data = features[idx])
 
-file.close()
+    file.close()
+    print('Extracted feature file : ' + os.path.dirname(opt.out_path))

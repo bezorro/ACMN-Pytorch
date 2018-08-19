@@ -38,7 +38,7 @@ class AccuracyEvaluator(object):
 
     def _add_batch(self, eqs):
 
-        self.total_eqs += eqs.sum()
+        self.total_eqs += eqs.sum().item()
         self.total     += eqs.size(0)
 
     def add_batch(self, out, data):

@@ -1,8 +1,5 @@
 import torch
-import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
-from torch.autograd import Variable
 
 from vqa_lab.utils import print_save
 
@@ -25,6 +22,8 @@ class ModelRunner(object):
 										lr=model_opt.lr                     , \
 										momentum = model_opt.momentum       , \
 										weight_decay=model_opt.weight_decay)
+		elif self.optimizer == 'adamax':
+			self.optimizer = optim.Adamax(self.model.parameters(), lr = model_opt.lr)
 
 		if lr_scheduler == 'step' : self.lr_scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, model_opt.lr_step_size, model_opt.lr_gamma)
 
@@ -33,7 +32,8 @@ class ModelRunner(object):
 
 		self.finished_epoch = 0
 
-		if self.gpu: self.model = self.model.cuda()
+		device = torch.device('cuda' if self.gpu else "cpu")
+		self.model = self.model.to(device)
 
 		if model_opt.resume is not None:
 			self.set_model_weights(model_opt.resume)
@@ -48,7 +48,7 @@ class ModelRunner(object):
 
 			def init_weights(m):
 
-				if isinstance(m, (nn.Conv2d, nn.Linear)): torch.nn.init.kaiming_uniform(m.weight)
+				if isinstance(m, (torch.nn.Conv2d, torch.nn.Linear)): torch.nn.init.kaiming_uniform_(m.weight)
 
 			self.model.apply(init_weights)
 
@@ -58,7 +58,6 @@ class ModelRunner(object):
 			checkpoint     		= torch.load(init_mothod)
 			self.finished_epoch = checkpoint['epoch']
 			self.model.load_state_dict(checkpoint['net'])
-			# if self.optimizer is not None : self.optimizer.load_state_dict(checkpoint['optimizer'])
 
 	def train_step(self, sample):
 
@@ -68,7 +67,7 @@ class ModelRunner(object):
 
 		self.optimizer.zero_grad()
 		output['loss'].backward()
-		output['loss'] = output['loss'].data.cpu()[0]
+		output['loss'] = output['loss'].item()
 		self.optimizer.step()
 		if self.lr_scheduler is not None : self.lr_scheduler.step()
 
@@ -80,7 +79,7 @@ class ModelRunner(object):
 		
 		output = self.forward_fn(self.model, sample, volatile=True, only_forward=False)
 
-		output['loss'] = output['loss'].data.cpu()[0]
+		output['loss'] = output['loss'].item()
 
 		return output
 

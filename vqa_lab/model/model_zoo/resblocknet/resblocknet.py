@@ -1,4 +1,3 @@
-from torch.autograd import Variable
 import torch.nn as nn
 import torch
 import torch.nn.functional as F
@@ -101,13 +100,13 @@ class ImgPrePro(nn.Module):
 	def __init__(self, cuda):
 		super(ImgPrePro, self).__init__()
 
-		self.conv1 = nn.Conv2d(3, 24, 3, stride=2, padding=1)
-		self.bn1 = nn.BatchNorm2d(24)
-		self.conv2 = nn.Conv2d(24, 64, 3, stride=2, padding=1)
-		self.bn2 = nn.BatchNorm2d(64)
-		self.conv3 = nn.Conv2d(64, 128, 3, stride=2, padding=1)
-		self.bn3 = nn.BatchNorm2d(128)
-		self.conv4 = nn.Conv2d(128, 128, 3, stride=1, padding=1)
+		self.conv1 = nn.Conv2d(1024, 512, 3, stride=2, padding=1)
+		self.bn1 = nn.BatchNorm2d(512)
+		self.conv2 = nn.Conv2d(512, 256, 3, stride=2, padding=1)
+		self.bn2 = nn.BatchNorm2d(256)
+		self.conv3 = nn.Conv2d(256, 256, 3, stride=2, padding=1)
+		self.bn3 = nn.BatchNorm2d(256)
+		self.conv4 = nn.Conv2d(256, 128, 3, stride=1, padding=1)
 		self.bn4 = nn.BatchNorm2d(128)
 
 		self.conv = nn.Conv2d(128, 128, 3, padding = 1)

@@ -2,7 +2,7 @@ import argparse
 import torch.optim as optim
 import torch.nn.functional as F
 import os
-from torch.autograd import Variable
+import torch
 
 from vqa_lab.model.model_runner import ModelRunner
 from vqa_lab.utils import print_save, forced_copydir
@@ -34,23 +34,19 @@ def ModelRunner_RBN(opt):
 
 	def forward(model, input, volatile = False, only_forward = False):
 
-		questions, images = Variable(input['question'], volatile=volatile), Variable(input['image'], volatile=volatile)
-		
-		if my_opt.rbn_gpu :
-			
-			questions, images = questions.cuda(), images.cuda()
+		device = torch.device('cuda' if my_opt.rbn_gpu else "cpu")
 
-		predicts = model(questions, images)
+		questions, images = input['question'].to(device), input['image'].to(device)
 
-		output = { 'predicts': predicts.data.cpu() }
+		with torch.set_grad_enabled(not volatile): predicts = model(questions, images)
+
+		output = { 'predicts': predicts.cpu() }
 
 		if only_forward == False : 
 			
-			answers = Variable(input['answer'], volatile=volatile)
+			answers = input['answer'].to(device)
 
-			if my_opt.rbn_gpu : answers = answers.cuda()
-
-			output['loss'] = F.cross_entropy(predicts, answers)
+			with torch.set_grad_enabled(not volatile): output['loss'] = F.cross_entropy(predicts, answers)
 
 		return output
 	

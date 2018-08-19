@@ -1,4 +1,3 @@
-from myutils import *
 import h5py
 import os.path
 import numpy as np
@@ -7,6 +6,7 @@ import torch
 import torch.nn.init
 from torch.utils.data import Dataset
 from PIL import Image
+from vqa_lab.utils import read_json
 from torchvision import transforms
 
 class figureqaDataset(Dataset):
@@ -71,7 +71,7 @@ class figureqaDataset(Dataset):
         self.mode = mode
 
         self.preprocess = transforms.Compose([
-           transforms.Scale((256,256)),
+           transforms.Resize((256,256)),
            transforms.ToTensor()
         ])
 
@@ -99,9 +99,9 @@ class figureqaDataset(Dataset):
         def id2imgName(img_id, qid):
 
             return {
-                     'train' : self.imgFolder+'%d.png' % img_id , \
-                     'val'   : self.imgFolder+'%d.png' % img_id , \
-                     'test'  : self.imgFolder+'%d.png' % img_id
+                     'train'  : self.imgFolder+'%d.png' % img_id , \
+                     'val1'   : self.imgFolder+'%d.png' % img_id , \
+                     'test'   : self.imgFolder+'%d.png' % img_id
                     }[self.mode]
 
         def load_image(img_name): ## load raw image

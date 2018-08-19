@@ -16,6 +16,8 @@ parser.add_argument('--resume', type=str, default=None, help='resume file name')
 parser.add_argument('--logdir', type=str, default='logs/test', help='dir to tensorboard logs')
 opt, _ = parser.parse_known_args()
 
+torch.backends.cudnn.benchmark = True
+
 #------ get dataloaders ------
 from vqa_lab.data.data_loader import getDateLoader
 print('==> Loading datasets :')

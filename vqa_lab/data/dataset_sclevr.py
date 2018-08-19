@@ -59,7 +59,7 @@ class sclevrDataset(Dataset):
 
         self.mode       = mode
         self.preprocess = transforms.Compose([
-           transforms.Scale((128,128)),
+           transforms.Resize((128,128)),
            transforms.ToTensor()
         ])
 

@@ -1,4 +1,5 @@
 from tensorboardX import SummaryWriter
+from torch.autograd import Variable
 import numpy as np
 
 class SingleNumberVizer(object):
@@ -17,8 +18,7 @@ class SingleNumberVizer(object):
 			self.writer.add_scalar(self.tag, number, pos)
 
 import matplotlib.cm
-from skimage import io, img_as_float
-from skimage.transform import resize, rescale
+from skimage.transform import resize
 import os, textwrap
 from PIL import ImageDraw, Image
 import scipy.misc
@@ -27,7 +27,9 @@ def get_attimg(image, attmap, cm = matplotlib.cm.ScalarMappable(cmap="jet")):
 
 	h, w = image.size(1), image.size(2)
 	s = attmap.size(-1)
-	attmap = attmap.squeeze().view(s, s).data.cpu().numpy()
+	if isinstance(image, Variable)  : image  = image.data
+	if isinstance(attmap, Variable) : attmap = attmap.data
+	attmap = attmap.squeeze().view(s, s).cpu().numpy()
 	attmap = resize(attmap, (h, w), mode='reflect')
 	attmap = cm.to_rgba(attmap)[:, :, 0:3]
 	attmap = torch.from_numpy(attmap).float().permute(2, 0, 1)
@@ -72,7 +74,7 @@ class AttImgVizer(object):
 
 					attimg = get_attimg(images[i_batch], attmap, self.colormap)
 					scipy.misc.imsave(os.path.join(sample_dir, 'L' \
-					 + str(i_attlist) + '_N' + str(i_attmap) + '.jpg'), attimg)
+					 + str(i_attlist) + '_N' + str(i_attmap) + '.jpg'), attimg.permute(1, 2, 0).numpy())
 
 			print(msgs[i_batch] + '?')
 
@@ -150,7 +152,7 @@ class RouteTree(object):
 		self.height = len(routing_weights) + 1 # <int> tree height
 		self.roots = [] # <list>[<node>]
 
-		active_nodes = [{} for _ in range(self.height)] # <dict>{'<tuple>(height, n, h, w)' : node}
+		active_nodes = [{} for _ in range(self.height)] # <list>[<dict>'(n, h, w)' : node]
 
 		def build_self_to_root(height, n, h, w):
 			
@@ -216,10 +218,12 @@ class RouteTree(object):
 			for i in range(len(rt.childs)):
 				c = rt.childs[i]
 				c_pos = heightnhw2pos(c.height, c.info['n'], c.info['h'], c.info['w'])
+				# if (rt_pos, c_pos, rt.weights[i]) not in  edges : edges.append( (rt_pos, c_pos, rt.weights[i]) )
 				edges.append( (rt_pos, c_pos, rt.weights[i]) )
 				dfs(c)
 
 		dfs(self.roots[0])
+		# for r in self.roots : dfs(r)
 		# end
 
 		# get v_labels
@@ -341,6 +345,7 @@ class CapsTreeVizer(object):
 
 			tree = RouteTree(rw)
 			lay  = tree.show(sample_dir, msgs[i_batch])
+			input()
 
 # if __name__ == '__main__':
 

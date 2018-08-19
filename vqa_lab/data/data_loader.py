@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 
 def DataloaderClevr(mode, opt = {}, dl = False, opt_prefix = 'clevr_'):
 
-	from vqa_lab.config import CLEVR_QA_DIR, CLEVR_IMG_H5, CLEVR_IMG_PNG
+	from vqa_lab.config import CLEVR_QA_DIR, CLEVR_IMG_H5, CLEVR_IMG_PNG, CLEVR_IMG_NPY
 	parser = argparse.ArgumentParser(description='PyTorch CLEVR DataLoaer')
 	parser.add_argument('--clevr_image_source', type=str, default='h5', help='h5|png')
 	parser.add_argument('--clevr_qa_dir', type=str, default=CLEVR_QA_DIR)
@@ -46,6 +46,55 @@ def DataloaderClevr(mode, opt = {}, dl = False, opt_prefix = 'clevr_'):
 	dataset_opt = argparse.Namespace(**{ k[prefix_len:] : v for k, v in my_opt.__dict__.items() }) # remove opt prefix
 	from functools import reduce
 	dataset = reduce(lambda x, y : x + y, [clevrDataset(dataset_opt, m) for m in mode.split('+')])
+
+	return DataLoader(dataset                      ,
+                    batch_size  = opt.batch_size   ,
+                    collate_fn  = my_collate       ,
+                    num_workers = opt.threads  	   ,
+                    shuffle     = (mode == 'train'),
+                    drop_last   = dl)
+
+def DataloaderSgkb(mode, opt = {}, dl = False, opt_prefix = 'sgkb_'):
+
+	from vqa_lab.config import SGKB_QA_DIR, SGKB_IMG_H5, SGKB_IMG_JPG, SGKB_IMG_NPY
+	parser = argparse.ArgumentParser(description='PyTorch SGKB DataLoaer')
+	parser.add_argument('--sgkb_image_source', type=str, default='npy', help='h5|jpg|npy')
+	parser.add_argument('--sgkb_qa_dir', type=str, default=SGKB_QA_DIR)
+	parser.add_argument('--sgkb_img_h5', type=str, default=SGKB_IMG_H5)
+	parser.add_argument('--sgkb_img_npy', type=str, default=SGKB_IMG_NPY)
+	parser.add_argument('--sgkb_img_jpg', type=str, default=SGKB_IMG_JPG)
+	parser.add_argument('--sgkb_load_jpg', type=bool, default=False)
+	my_opt, _  = parser.parse_known_args()
+	prefix_len = len(opt_prefix)
+
+	if isinstance(opt, dict) : opt = argparse.Namespace(opt)
+
+	my_opt = update_opt_remove_prefix(my_opt, opt, opt_prefix) # my_opt = { opt_prefix + '...' }
+
+	if 'logdir' in opt.__dict__: print_save(opt.logdir, my_opt, to_screen=False)
+
+	from .dataset_sgkb import sgkbDataset
+
+	def my_collate(batch):
+
+		raw_samples = { key: [d[key] for d in batch] for key in batch[0] }
+
+		samples = {
+                    'question': torch.stack(raw_samples['question'])   ,
+                    'image'   : torch.stack(raw_samples['image'])      ,
+                    'qid'     : torch.LongTensor(raw_samples['qid'])   ,
+                }
+
+		if 'answer'     in raw_samples : 
+			samples['answer']  = torch.LongTensor(raw_samples['answer'])
+		if 'img_jpg'    in raw_samples :
+			samples['img_jpg'] = torch.stack(raw_samples['img_jpg'])
+
+		return samples
+
+	dataset_opt = argparse.Namespace(**{ k[prefix_len:] : v for k, v in my_opt.__dict__.items() }) # remove opt prefix
+	from functools import reduce
+	dataset = reduce(lambda x, y : x + y, [sgkbDataset(dataset_opt, m) for m in mode.split('+')])
 
 	return DataLoader(dataset                      ,
                     batch_size  = opt.batch_size   ,
@@ -199,4 +248,5 @@ def getDateLoader(dataset):
 				'clevr'    : DataloaderClevr    ,
 				'vqav2'    : DataloaderVQAv2    ,
 				'figureqa' : DataloaderFigureQA ,
+				'sgkb'     : DataloaderSgkb     ,
 			}[dataset]

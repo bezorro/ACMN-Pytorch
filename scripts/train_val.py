@@ -28,6 +28,7 @@ parser.add_argument('--logdir', type=str, default='logs/train_val', help='dir to
 opt, _ = parser.parse_known_args()
 print_save(opt.logdir, opt)
 
+torch.backends.cudnn.benchmark = True
 torch.manual_seed(opt.seed)
 if opt.gpu: torch.cuda.manual_seed(opt.seed)
 
@@ -71,7 +72,7 @@ def train(epoch):
 		output_batch = model_runner.train_step(input_batch)
 		LE.add_batch(output_batch, input_batch)
 		LV.print_result(i_batch + len(dataset_train) * (epoch - 1), output_batch['loss'])
-
+		break
 	LE.get_print_result()
 #----------- end -------------
 
@@ -91,6 +92,7 @@ def val(epoch):
 		output_batch = model_runner.val_step(input_batch)
 		AE.add_batch(output_batch, input_batch)
 		LE.add_batch(output_batch, input_batch)
+		break
 	
 	test_loss = LE.get_print_result()
 	acc       = AE.get_print_result()
